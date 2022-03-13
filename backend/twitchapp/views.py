@@ -20,5 +20,6 @@ class Twitch(views.APIView):
         df=pd.DataFrame(message,columns=['message'])
         y_pred = preprocess(df)
         #results = TwitchSerializer(y_pred).data
-        response_twitch = {"response":request.data}
+        print(y_pred)
+        response_twitch = {"response":y_pred}
         return Response(response_twitch)

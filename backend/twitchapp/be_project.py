@@ -281,10 +281,19 @@ def preprocess(df):
         y_pred = model.predict(X_test)
         #print('y_pred')
         #print(y_pred)
-        return y_pred
+        d={0:'Angry', 1:'Disgust', 2:'Excited', 3:'Happy', 4:'Neutral', 5:'Sad', 6:'Surprise'}
+        #print(d)
+        #print(type(y_pred))
+        unique, counts = np.unique(y_pred, return_counts=True)
+        c=dict(zip(unique, counts))
+        ans={}
+        for x in d.keys():
+            if(x in c.keys()):
+                ans[d[x]]=c[x]
+        #print(ans)
+        return ans
     y_pred=model_evaluate_test(MNBmodel)
-
     return y_pred
-preprocess(df)
+#preprocess(df)
 
 
