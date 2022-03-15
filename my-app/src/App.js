@@ -51,11 +51,16 @@ export default class App extends Component {
     "Sad",
     "Surprised",
   ];
-  
-  
- 
+   
   fetchdata = async () => {
-    fetch("https://mocki.io/v1/ee587087-28a1-4453-be34-4b1e9dcf9a4b")
+    fetch("http://127.0.0.1:8000/twitch/",{
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body:JSON.stringify({"message":this.state.cart})
+    })
       .then((response) => response.json())
       .then(async (data) => {
         console.log(data["response"]);
@@ -108,6 +113,7 @@ export default class App extends Component {
 
     this.setState({ text: "" });
     e.preventDefault();
+    this.dummy.current.scrollIntoView({behavior:'smooth'})
   };
 
   render() {
@@ -138,7 +144,6 @@ export default class App extends Component {
                 Add Comment{" "}
               </button>
             </div>
-
             <ol>
               {this.state.cart.map((subItems, sIndex) => {
                 return <li key={sIndex}> {subItems}</li>;
@@ -157,7 +162,7 @@ export default class App extends Component {
                     label: "Emotions identified",
                     data: this.state.emotion_values,
                     backgroundColor: this.state.emotion_values.map((v, index) =>
-                    index == this.state.maxindex ? "red" : "green"
+                    index === this.state.maxindex ? "#ed6a1f" : "#1fafed"
                   ),
                   },
                 ]}

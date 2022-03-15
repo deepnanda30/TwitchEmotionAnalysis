@@ -14,7 +14,7 @@ from rest_framework import views
 #     print(y_pred)
 
 class Twitch(views.APIView):
-    def get(self, request):
+    def post(self, request):
         #print(request.data)
         message = request.data["message"]
         df=pd.DataFrame(message,columns=['message'])
