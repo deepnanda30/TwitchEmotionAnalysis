@@ -29,7 +29,7 @@ export default class App extends Component {
     Happy: 0,
     Neutral: 0,
     Sad: 0,
-    Surprised: 0,
+    Surprise: 0,
     emotion_values: [0, 0, 0, 0, 0, 0, 0],
     bool: false,
     maxindex:0,
@@ -49,7 +49,7 @@ export default class App extends Component {
     "Happy",
     "Neutral",
     "Sad",
-    "Surprised",
+    "Surprise",
   ];
    
   fetchdata = async () => {
@@ -65,7 +65,7 @@ export default class App extends Component {
       .then(async (data) => {
         console.log(data["response"]);
         console.log(data["response"]["Angry"]);
-        let { Angry, Disgust, Excited, Sad, Surprised, Happy, Neutral } =
+        let { Angry, Disgust, Excited, Sad, Surprise, Happy, Neutral } =
           this.state;
         await this.setState({
           Angry: data["response"]["Angry"] || 0,
@@ -74,7 +74,7 @@ export default class App extends Component {
           Sad: data["response"]["Sad"] || 0,
           Neutral: data["response"]["Neutral"] || 0,
           Happy: data["response"]["Happy"] || 0,
-          Surprised: data["response"]["Surprised"] || 0,
+          Surprise: data["response"]["Surprise"] || 0,
         });
 
         
@@ -86,7 +86,7 @@ export default class App extends Component {
             this.state.Happy,
             this.state.Neutral,
             this.state.Sad,
-            this.state.Surprised,
+            this.state.Surprise,
           ],
         });
         await this.setState({
@@ -107,7 +107,7 @@ export default class App extends Component {
   addNewItem = (e) => {
     let { cart, text } = this.state;
     cart.push(text);
-    if (cart.length > 5) {
+    if (cart.length > 1) {
       this.fetchdata();
     }
 
@@ -119,6 +119,7 @@ export default class App extends Component {
   render() {
     return (
       <div className="row">
+        {/* chart */}
         <div className="col-6 form-group">
           <form>
             <div className="form-group p-2 ">
@@ -152,24 +153,26 @@ export default class App extends Component {
           </form>
         </div>
 
+
+        {/* chart */}
         {this.state.bool && (
-          <div className="col-6">
-            <Bar
-              data= {
-                {labels: this.labels,
-                datasets: [
-                  {
-                    label: "Emotions identified",
-                    data: this.state.emotion_values,
-                    backgroundColor: this.state.emotion_values.map((v, index) =>
-                    index === this.state.maxindex ? "#ed6a1f" : "#1fafed"
-                  ),
-                  },
-                ]}
-              }
-              
-            />
-          </div>
+        <div className="col-6">
+          <Bar
+            data= {
+              {labels: this.labels,
+              datasets: [
+                {
+                  label: "Emotions identified",
+                  data: this.state.emotion_values,
+                  backgroundColor: this.state.emotion_values.map((v, index) =>
+                  index === this.state.maxindex ? "#ed6a1f" : "#1fafed"
+                ),
+                },
+              ]}
+            }
+            
+          />
+        </div>
         )}
       </div>
     );

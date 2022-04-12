@@ -275,7 +275,7 @@ def preprocess(df):
     
     vectorizer = pickle.load(open(os.path.join(BASE_DIR,'twitchapp\\vectorizer.sav'),'rb'))
     X_test  = vectorizer.transform(X_test)
-    MNBmodel = pickle.load(open(os.path.join(BASE_DIR,'twitchapp\\MNBmodel.sav'),'rb'))
+    model = pickle.load(open(os.path.join(BASE_DIR,'twitchapp\\LRModel.sav'),'rb'))
 
     def model_evaluate_test(model):
         y_pred = model.predict(X_test)
@@ -292,7 +292,7 @@ def preprocess(df):
                 ans[d[x]]=c[x]
         #print(ans)
         return ans
-    y_pred=model_evaluate_test(MNBmodel)
+    y_pred=model_evaluate_test(model)
     return y_pred
 #preprocess(df)
 
