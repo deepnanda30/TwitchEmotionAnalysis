@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import "./App.css";
+import "./Design.css";
+import ScrollToBottom from "react-scroll-to-bottom";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,6 +12,7 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
+import { isLabelWithInternallyDisabledControl } from "@testing-library/user-event/dist/utils";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -18,6 +21,9 @@ ChartJS.register(
   Tooltip,
   Legend
 );
+
+ChartJS.defaults.color = "#c2bbba";
+ChartJS.defaults.borderColor = "#c2bbba";
 
 export default class App extends Component {
   state = {
@@ -32,7 +38,7 @@ export default class App extends Component {
     Surprise: 0,
     emotion_values: [0, 0, 0, 0, 0, 0, 0],
     bool: false,
-    maxindex:0,
+    maxindex: 0,
   };
 
   argMax = (array) => {
@@ -41,7 +47,6 @@ export default class App extends Component {
       .reduce((r, a) => (a[0] > r[0] ? a : r))[1];
   };
 
-  
   labels = [
     "Angry",
     "Disgust",
@@ -51,15 +56,15 @@ export default class App extends Component {
     "Sad",
     "Surprise",
   ];
-   
+
   fetchdata = async () => {
-    fetch("http://127.0.0.1:8000/twitch/",{
-      method: 'POST',
+    fetch("http://127.0.0.1:8000/twitch/", {
+      method: "POST",
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
-      body:JSON.stringify({"message":this.state.cart})
+      body: JSON.stringify({ message: this.state.cart }),
     })
       .then((response) => response.json())
       .then(async (data) => {
@@ -77,8 +82,7 @@ export default class App extends Component {
           Surprise: data["response"]["Surprise"] || 0,
         });
 
-        
-       await  this.setState({
+        await this.setState({
           emotion_values: [
             this.state.Angry,
             this.state.Disgust,
@@ -90,13 +94,11 @@ export default class App extends Component {
           ],
         });
         await this.setState({
-          maxindex:this.argMax(this.state.emotion_values)
-        })
+          maxindex: this.argMax(this.state.emotion_values),
+        });
         await this.setState({ bool: true });
-       
-       
-        console.log("current state is "+ JSON.stringify(this.state) );
-        
+
+        console.log("current state is " + JSON.stringify(this.state));
       });
   };
 
@@ -107,74 +109,108 @@ export default class App extends Component {
   addNewItem = (e) => {
     let { cart, text } = this.state;
     cart.push(text);
-    if (cart.length > 1) {
+    if (cart.length > 0) {
       this.fetchdata();
     }
 
     this.setState({ text: "" });
     e.preventDefault();
-    this.dummy.current.scrollIntoView({behavior:'smooth'})
+    //this.dummy.current.scrollIntoView({behavior:'smooth'})
   };
 
+  options = {
+    plugins: {
+      legend: {
+        labels: {
+          font: {
+            size: 16,
+          },
+        },
+      },
+    },
+    scales: {
+      x: {
+        ticks: {
+          font: {
+            size: 14,
+          },
+        },
+        grid: {
+          display: false,
+        },
+      },
+      y: {
+        ticks: {
+          font: {
+            size: 14,
+          },
+        },
+        grid: {
+          display: false,
+        },
+      },
+    },
+  };
   render() {
     return (
-      <div className="row">
-        {/* chart */}
-        <div className="col-6 form-group">
-          <form>
-            <div className="form-group p-2 ">
-              <label for="exampleInputEmail1" className="p-2">
-                Twitch Chat Box
-              </label>
-              <div className="col-sm-6">
-                <input
-                  className="form-control "
-                  aria-describedby="emailHelp"
-                  placeholder="Enter text"
-                  value={this.state.text}
-                  type="text"
-                  onChange={this.saveInput}
-                />
+      <>
+        <div className="outerContainer">
+          <div className="container">
+            <div className="infoBar">
+              <div className="leftInnerContainer">
+                <h3>Twitch Chat</h3>
               </div>
-
-              <small id="emailHelp" className="form-text text-muted"></small>
             </div>
-            <div className="p-2">
-              <button onClick={this.addNewItem} className="btn btn-primary ">
-                {" "}
-                Add Comment{" "}
+            <ScrollToBottom className="messages">
+              {this.state.cart.map((subItems, sIndex) => (
+                <div key={sIndex}>
+                  <div className="messageContainer justifyEnd">
+                    <div className="messageBox backgroundBlue">
+                      <p className="messageText colorWhite">{subItems}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </ScrollToBottom>
+            <form className="form">
+              <input
+                className="input"
+                type="text"
+                placeholder="Type your comment..."
+                value={this.state.text}
+                onChange={this.saveInput}
+              />
+              <button
+                className="sendButton"
+                onClick={this.addNewItem}
+                style={{ cursor: "pointer" }}
+              >
+                Send
               </button>
+            </form>
+          </div>
+          {this.state.bool && (
+            <div className="col-6 textContainer">
+              <Bar
+                data={{
+                  labels: this.labels,
+                  datasets: [
+                    {
+                      label: "Emotions identified",
+                      data: this.state.emotion_values,
+                      backgroundColor: this.state.emotion_values.map(
+                        (v, index) =>
+                          index === this.state.maxindex ? "#ed6a1f" : "#1fafed"
+                      ),
+                    },
+                  ],
+                }}
+                options={this.options}
+              />
             </div>
-            <ol>
-              {this.state.cart.map((subItems, sIndex) => {
-                return <li key={sIndex}> {subItems}</li>;
-              })}
-            </ol>
-          </form>
+          )}
         </div>
-
-
-        {/* chart */}
-        {this.state.bool && (
-        <div className="col-6">
-          <Bar
-            data= {
-              {labels: this.labels,
-              datasets: [
-                {
-                  label: "Emotions identified",
-                  data: this.state.emotion_values,
-                  backgroundColor: this.state.emotion_values.map((v, index) =>
-                  index === this.state.maxindex ? "#ed6a1f" : "#1fafed"
-                ),
-                },
-              ]}
-            }
-            
-          />
-        </div>
-        )}
-      </div>
+      </>
     );
   }
 }
